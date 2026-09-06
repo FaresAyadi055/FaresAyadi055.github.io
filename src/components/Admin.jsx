@@ -3,6 +3,42 @@ import ReactMarkdown from 'react-markdown';
 import { fetchAdminAnalytics, fetchAdminChatSessions, fetchAdminChatSession, deleteAdminChatSession } from '../lib/api.js';
 import AdminAnalytics from './AdminAnalytics.jsx';
 
+function Skeleton({ className = '' }) {
+  return <div className={`animate-pulse rounded-sm bg-ink-line/40 ${className}`} />;
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-8 max-w-5xl mx-auto">
+      <section>
+        <Skeleton className="mb-4 h-5 w-64" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+        </div>
+        <Skeleton className="mt-4 h-64" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <Skeleton className="h-40" />
+          <Skeleton className="h-40" />
+          <Skeleton className="h-40" />
+          <Skeleton className="h-40" />
+        </div>
+      </section>
+      <section>
+        <Skeleton className="mb-4 h-5 w-56" />
+        <div className="space-y-3">
+          <Skeleton className="h-14" />
+          <Skeleton className="h-14" />
+          <Skeleton className="h-14" />
+          <Skeleton className="h-14" />
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function ChatSession({ session, onLoad, onDelete }) {
   return (
     <div className="flex items-center justify-between rounded-sm border border-ink-line bg-ink-panel/40 px-4 py-3 text-sm">
@@ -158,7 +194,6 @@ export default function Admin({ onClose }) {
         <h2 className="font-mono text-sm uppercase tracking-widest text-blue-bright">Admin Dashboard</h2>
         <div className="flex items-center gap-4">
           {actionMsg && <p className="font-mono text-xs text-copper">{actionMsg}</p>}
-          {loading && <p className="font-mono text-xs text-paper-dim">Loading&hellip;</p>}
           <button
             onClick={loadDashboard}
             disabled={loading}
@@ -185,30 +220,36 @@ export default function Admin({ onClose }) {
       <div className="flex-1 overflow-y-auto px-6 py-6">
         {view === 'dashboard' && (
           <div className="space-y-8 max-w-5xl mx-auto">
-            {/* Analytics */}
-            <section>
-              <h3 className="font-mono text-lg font-semibold text-paper mb-4">Page Visitors — Analytics</h3>
-              <AdminAnalytics analytics={analytics} />
-            </section>
+            {loading ? (
+              <DashboardSkeleton />
+            ) : (
+              <>
+                {/* Analytics */}
+                <section>
+                  <h3 className="font-mono text-lg font-semibold text-paper mb-4">Page Visitors — Analytics</h3>
+                  <AdminAnalytics analytics={analytics} />
+                </section>
 
-            {/* Chat Sessions */}
-            <section>
-              <h3 className="font-mono text-lg font-semibold text-paper mb-4">AI Chat Sessions</h3>
-              {sessions.length === 0 ? (
-                <p className="text-paper-dim">No chat sessions yet.</p>
-              ) : (
-                <div className="space-y-3">
-                  {sessions.map((session) => (
-                    <ChatSession
-                      key={session.id}
-                      session={session}
-                      onLoad={handleLoadSession}
-                      onDelete={handleDeleteSession}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
+                {/* Chat Sessions */}
+                <section>
+                  <h3 className="font-mono text-lg font-semibold text-paper mb-4">AI Chat Sessions</h3>
+                  {sessions.length === 0 ? (
+                    <p className="text-paper-dim">No chat sessions yet.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {sessions.map((session) => (
+                        <ChatSession
+                          key={session.id}
+                          session={session}
+                          onLoad={handleLoadSession}
+                          onDelete={handleDeleteSession}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </section>
+              </>
+            )}
           </div>
         )}
 
