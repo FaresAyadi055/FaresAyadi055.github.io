@@ -243,6 +243,11 @@ function BarList({ title, data }) {
 }
 
 function VisitorList({ visitors }) {
+  const [page, setPage] = useState(1);
+  const perPage = 10;
+  const totalPages = Math.ceil(visitors.length / perPage);
+  const pageVisitors = visitors.slice((page - 1) * perPage, page * perPage);
+
   if (visitors.length === 0) {
     return (
       <div className="rounded-sm border border-ink-line bg-ink-panel/40 p-5">
@@ -257,7 +262,7 @@ function VisitorList({ visitors }) {
       <h4 className="font-mono text-xs uppercase tracking-wider text-paper-dim mb-4">
         Visitors <span className="text-paper-dim/50">({visitors.length} unique)</span>
       </h4>
-      <div className="max-h-80 overflow-y-auto">
+      <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-ink-line/50 font-mono text-[11px] uppercase tracking-wider text-paper-dim">
@@ -268,7 +273,7 @@ function VisitorList({ visitors }) {
             </tr>
           </thead>
           <tbody>
-            {visitors.map((v) => (
+            {pageVisitors.map((v) => (
               <tr key={v.ipAddress} className="border-b border-ink-line/30 text-paper-dim">
                 <td className="py-2 pr-4 font-mono text-xs text-blue-bright">{v.ipAddress || '—'}</td>
                 <td className="py-2 pr-4">{[v.city, v.country].filter(Boolean).join(', ') || '—'}</td>
@@ -279,6 +284,27 @@ function VisitorList({ visitors }) {
           </tbody>
         </table>
       </div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-4">
+          <button
+            onClick={() => setPage((p) => p - 1)}
+            disabled={page <= 1}
+            className="rounded-sm border border-ink-line px-3 py-1 font-mono text-xs text-paper-dim outline-none transition-colors hover:border-blue-bright hover:text-blue-bright disabled:opacity-30 disabled:pointer-events-none"
+          >
+            ← Prev
+          </button>
+          <span className="font-mono text-xs text-paper-dim">
+            {page} / {totalPages}
+          </span>
+          <button
+            onClick={() => setPage((p) => p + 1)}
+            disabled={page >= totalPages}
+            className="rounded-sm border border-ink-line px-3 py-1 font-mono text-xs text-paper-dim outline-none transition-colors hover:border-blue-bright hover:text-blue-bright disabled:opacity-30 disabled:pointer-events-none"
+          >
+            Next →
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -63,6 +63,32 @@ function ChatSession({ session, onLoad, onDelete }) {
   );
 }
 
+function Pagination({ page, total, perPage, onChange }) {
+  const totalPages = Math.ceil(total / perPage);
+  if (totalPages <= 1) return null;
+  return (
+    <div className="flex items-center justify-center gap-2 mt-4">
+      <button
+        onClick={() => onChange(page - 1)}
+        disabled={page <= 1}
+        className="rounded-sm border border-ink-line px-3 py-1 font-mono text-xs text-paper-dim outline-none transition-colors hover:border-blue-bright hover:text-blue-bright disabled:opacity-30 disabled:pointer-events-none"
+      >
+        ← Prev
+      </button>
+      <span className="font-mono text-xs text-paper-dim">
+        {page} / {totalPages}
+      </span>
+      <button
+        onClick={() => onChange(page + 1)}
+        disabled={page >= totalPages}
+        className="rounded-sm border border-ink-line px-3 py-1 font-mono text-xs text-paper-dim outline-none transition-colors hover:border-blue-bright hover:text-blue-bright disabled:opacity-30 disabled:pointer-events-none"
+      >
+        Next →
+      </button>
+    </div>
+  );
+}
+
 export default function Admin({ onClose }) {
   const [authed, setAuthed] = useState(!!localStorage.getItem('ADMIN_ACCESS_TOKEN'));
   const [checking, setChecking] = useState(false);
@@ -75,6 +101,8 @@ export default function Admin({ onClose }) {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [actionMsg, setActionMsg] = useState('');
+  const [sessionPage, setSessionPage] = useState(1);
+  const SESSIONS_PER_PAGE = 10;
 
   useEffect(() => {
     if (authed) {
@@ -236,16 +264,26 @@ export default function Admin({ onClose }) {
                   {sessions.length === 0 ? (
                     <p className="text-paper-dim">No chat sessions yet.</p>
                   ) : (
-                    <div className="space-y-3">
-                      {sessions.map((session) => (
-                        <ChatSession
-                          key={session.id}
-                          session={session}
-                          onLoad={handleLoadSession}
-                          onDelete={handleDeleteSession}
-                        />
-                      ))}
-                    </div>
+                    <>
+                      <div className="space-y-3">
+                        {sessions
+                          .slice((sessionPage - 1) * SESSIONS_PER_PAGE, sessionPage * SESSIONS_PER_PAGE)
+                          .map((session) => (
+                            <ChatSession
+                              key={session.id}
+                              session={session}
+                              onLoad={handleLoadSession}
+                              onDelete={handleDeleteSession}
+                            />
+                          ))}
+                      </div>
+                      <Pagination
+                        page={sessionPage}
+                        total={sessions.length}
+                        perPage={SESSIONS_PER_PAGE}
+                        onChange={setSessionPage}
+                      />
+                    </>
                   )}
                 </section>
               </>
