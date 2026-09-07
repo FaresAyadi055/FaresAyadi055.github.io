@@ -110,7 +110,7 @@ export default function Admin({ onClose }) {
   function flashActionMsg(msg) {
     setActionMsg(msg);
     clearTimeout(msgTimer.current);
-    msgTimer.current = setTimeout(() => setActionMsg(''), 2000);
+    msgTimer.current = setTimeout(() => setActionMsg(''), 1500);
   }
 
   useEffect(() => {
