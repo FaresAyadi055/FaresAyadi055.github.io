@@ -139,11 +139,11 @@ export default function Navbar({ onOpenAdmin }) {
       {/* Mobile menu overlay */}
       {menuOpen && (
         <div
-          className="fixed inset-0 top-0 z-50 bg-ink-deep md:hidden"
+          className="fixed inset-0 top-[57px] z-50 bg-[#0a0e17] md:hidden"
           onClick={() => setMenuOpen(false)}
         >
           <nav
-            className="mx-auto flex max-w-6xl flex-col gap-1 px-6 pt-8"
+            className="mx-auto flex max-w-6xl flex-col gap-1 rounded-sm bg-ink-deep px-6 pt-8"
             aria-label="Mobile navigation"
             onClick={(e) => e.stopPropagation()}
           >
