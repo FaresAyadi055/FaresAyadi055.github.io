@@ -144,3 +144,15 @@ export async function deleteAdminChatSession(sessionId) {
     headers: adminHeaders(),
   });
 }
+
+export async function fetchSetting(key) {
+  return adminFetch(`${API_BASE}/admin/api/settings/${key}`, { headers: adminHeaders() });
+}
+
+export async function updateSetting(key, value) {
+  return adminFetch(`${API_BASE}/admin/api/settings/${key}`, {
+    method: 'PUT',
+    headers: adminHeaders(),
+    body: JSON.stringify({ value }),
+  });
+}

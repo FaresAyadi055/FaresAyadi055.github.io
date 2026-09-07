@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { fetchAdminAnalytics, fetchAdminChatSessions, fetchAdminChatSession, deleteAdminChatSession } from '../lib/api.js';
+import { fetchAdminAnalytics, fetchAdminChatSessions, fetchAdminChatSession, deleteAdminChatSession, fetchSetting, updateSetting } from '../lib/api.js';
 import AdminAnalytics from './AdminAnalytics.jsx';
 
 function Skeleton({ className = '' }) {
@@ -102,6 +102,8 @@ export default function Admin({ onClose }) {
   const [loading, setLoading] = useState(false);
   const [actionMsg, setActionMsg] = useState('');
   const [sessionPage, setSessionPage] = useState(1);
+  const [notifyVisitors, setNotifyVisitors] = useState(false);
+  const [settingsLoading, setSettingsLoading] = useState(false);
   const SESSIONS_PER_PAGE = 10;
 
   useEffect(() => {
@@ -116,6 +118,9 @@ export default function Admin({ onClose }) {
       const [a, s] = await Promise.all([fetchAdminAnalytics(), fetchAdminChatSessions()]);
       setAnalytics(a.analytics || []);
       setSessions(s.sessions || []);
+      fetchSetting('NOTIFY_NEW_VISITORS')
+        .then((r) => setNotifyVisitors(r.value === 'true'))
+        .catch(() => {});
     } catch (err) {
       if (err.isNetworkError) {
         // Couldn't reach the server at all (offline, CORS, backend down, etc).
@@ -175,6 +180,20 @@ export default function Admin({ onClose }) {
       setActionMsg('Session deleted.');
     } catch {
       setActionMsg('Failed to delete session.');
+    }
+  }
+
+  async function handleToggleNotify() {
+    const next = !notifyVisitors;
+    setSettingsLoading(true);
+    try {
+      await updateSetting('NOTIFY_NEW_VISITORS', String(next));
+      setNotifyVisitors(next);
+      setActionMsg(next ? 'Visitor notifications enabled.' : 'Visitor notifications disabled.');
+    } catch {
+      setActionMsg('Failed to update setting.');
+    } finally {
+      setSettingsLoading(false);
     }
   }
 
@@ -252,6 +271,32 @@ export default function Admin({ onClose }) {
               <DashboardSkeleton />
             ) : (
               <>
+                {/* Settings */}
+                <section>
+                  <h3 className="font-mono text-lg font-semibold text-paper mb-4">Settings</h3>
+                  <div className="flex items-center justify-between rounded-sm border border-ink-line bg-ink-panel/40 px-5 py-4">
+                    <div>
+                      <p className="font-mono text-sm text-paper">New visitor notifications</p>
+                      <p className="mt-1 text-xs text-paper-dim">Send a Telegram message when a new unique visitor arrives.</p>
+                    </div>
+                    <button
+                      onClick={handleToggleNotify}
+                      disabled={settingsLoading}
+                      className={`relative h-6 w-11 rounded-full transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-bright ${
+                        notifyVisitors ? 'bg-blue-bright' : 'bg-ink-line'
+                      } ${settingsLoading ? 'opacity-50' : ''}`}
+                      role="switch"
+                      aria-checked={notifyVisitors}
+                    >
+                      <span
+                        className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-paper transition-transform duration-200 ${
+                          notifyVisitors ? 'translate-x-5' : ''
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </section>
+
                 {/* Analytics */}
                 <section>
                   <h3 className="font-mono text-lg font-semibold text-paper mb-4">Page Visitors — Analytics</h3>
