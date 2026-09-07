@@ -200,7 +200,7 @@ export default function Admin({ onClose }) {
   // Auth gate
   if (!authed || checking) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-deep">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-deep/95">
         <div className="max-w-md w-full rounded-sm border border-ink-line bg-ink-panel p-8">
           <h2 className="font-mono text-xl font-semibold text-paper">Admin Access</h2>
           {checking ? (
@@ -237,7 +237,7 @@ export default function Admin({ onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-ink-deep">
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-ink-line bg-ink-panel px-6 py-3">
+      <header className="flex items-center justify-between border-b border-ink-line bg-ink-panel/80 px-6 py-3">
         <h2 className="font-mono text-sm uppercase tracking-widest text-blue-bright">Admin Dashboard</h2>
         <div className="flex items-center gap-4">
           {actionMsg && <p className="font-mono text-xs text-copper">{actionMsg}</p>}

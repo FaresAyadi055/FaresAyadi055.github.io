@@ -139,7 +139,7 @@ export default function Navbar({ onOpenAdmin }) {
       {/* Mobile menu overlay */}
       {menuOpen && (
         <div
-          className="fixed inset-0 top-[57px] z-50 bg-ink-deep/98 md:hidden"
+          className="fixed inset-0 top-0 z-50 bg-ink-deep md:hidden"
           onClick={() => setMenuOpen(false)}
         >
           <nav
