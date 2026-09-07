@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { fetchAdminAnalytics, fetchAdminChatSessions, fetchAdminChatSession, deleteAdminChatSession, fetchSetting, updateSetting } from '../lib/api.js';
 import AdminAnalytics from './AdminAnalytics.jsx';
@@ -105,6 +105,13 @@ export default function Admin({ onClose }) {
   const [notifyVisitors, setNotifyVisitors] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
   const SESSIONS_PER_PAGE = 10;
+  const msgTimer = useRef(null);
+
+  function flashActionMsg(msg) {
+    setActionMsg(msg);
+    clearTimeout(msgTimer.current);
+    msgTimer.current = setTimeout(() => setActionMsg(''), 2000);
+  }
 
   useEffect(() => {
     if (authed) {
@@ -189,9 +196,9 @@ export default function Admin({ onClose }) {
     try {
       await updateSetting('NOTIFY_NEW_VISITORS', String(next));
       setNotifyVisitors(next);
-      setActionMsg(next ? 'Visitor notifications enabled.' : 'Visitor notifications disabled.');
+      flashActionMsg(next ? 'Visitor notifications enabled.' : 'Visitor notifications disabled.');
     } catch {
-      setActionMsg('Failed to update setting.');
+      flashActionMsg('Failed to update setting.');
     } finally {
       setSettingsLoading(false);
     }
