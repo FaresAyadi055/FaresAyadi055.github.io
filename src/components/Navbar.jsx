@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Link } from 'react-aria-components';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Menu, X } from 'lucide-react';
 
 const NAV_LINKS = [
   { id: 'services', label: 'Services' },
@@ -19,6 +19,7 @@ export default function Navbar({ onOpenAdmin }) {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState('top');
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -56,6 +57,15 @@ export default function Navbar({ onOpenAdmin }) {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
   return (
     <header
       className={`sticky top-0 z-40 border-b backdrop-blur transition-colors duration-300 ${
@@ -76,6 +86,7 @@ export default function Navbar({ onOpenAdmin }) {
           </span>
         </a>
 
+        {/* Desktop nav */}
         <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
           {NAV_LINKS.map((link) => (
             <Link
@@ -99,6 +110,7 @@ export default function Navbar({ onOpenAdmin }) {
         </nav>
 
         <div className="flex items-center gap-3">
+          {/* Desktop theme + start project */}
           <Button
             onPress={toggleTheme}
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -108,12 +120,64 @@ export default function Navbar({ onOpenAdmin }) {
           </Button>
           <Button
             onPress={() => scrollTo('contact')}
-            className="rounded-sm border border-copper px-4 py-2 font-mono text-xs uppercase tracking-widest text-copper outline-none transition-colors hover:bg-copper hover:text-ink-deep data-[focus-visible]:bg-copper data-[focus-visible]:text-ink-deep"
+            className="hidden rounded-sm border border-copper px-4 py-2 font-mono text-xs uppercase tracking-widest text-copper outline-none transition-colors hover:bg-copper hover:text-ink-deep data-[focus-visible]:bg-copper data-[focus-visible]:text-ink-deep md:inline-block"
           >
             Start a project
           </Button>
+
+          {/* Mobile burger */}
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            className="grid h-9 w-9 place-items-center rounded-sm border border-ink-line text-paper-dim outline-none transition-colors hover:border-blue-bright hover:text-blue-bright md:hidden"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          >
+            {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile menu overlay */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 top-[57px] z-50 bg-ink-deep/98 md:hidden"
+          onClick={() => setMenuOpen(false)}
+        >
+          <nav
+            className="mx-auto flex max-w-6xl flex-col gap-1 px-6 pt-8"
+            aria-label="Mobile navigation"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {NAV_LINKS.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => { scrollTo(link.id); setMenuOpen(false); }}
+                className={`w-full rounded-sm px-4 py-3 text-left font-mono text-sm uppercase tracking-widest outline-none transition-colors ${
+                  active === link.id
+                    ? 'bg-blue-line/20 text-blue-bright'
+                    : 'text-paper-dim hover:bg-ink-panel/40 hover:text-paper'
+                }`}
+              >
+                {link.label}
+              </button>
+            ))}
+            {isAdmin && (
+              <button
+                onClick={() => { onOpenAdmin(); setMenuOpen(false); }}
+                className="w-full rounded-sm px-4 py-3 text-left font-mono text-sm uppercase tracking-widest text-copper outline-none transition-colors hover:bg-ink-panel/40 hover:text-copper"
+              >
+                Admin
+              </button>
+            )}
+            <div className="my-4 border-t border-ink-line/50" />
+            <Button
+              onPress={() => { scrollTo('contact'); setMenuOpen(false); }}
+              className="w-full rounded-sm border border-copper px-4 py-3 font-mono text-sm uppercase tracking-widest text-copper outline-none transition-colors hover:bg-copper hover:text-ink-deep"
+            >
+              Start a project
+            </Button>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
