@@ -143,7 +143,7 @@ export default function Navbar({ onOpenAdmin }) {
           onClick={() => setMenuOpen(false)}
         >
           <nav
-            className="mx-auto flex max-w-6xl flex-col gap-1 rounded-sm bg-ink-deep px-6 pt-8"
+            className="mx-auto flex max-w-6xl flex-col gap-0 rounded-sm bg-ink-deep px-6 pt-8"
             aria-label="Mobile navigation"
             onClick={(e) => e.stopPropagation()}
           >
@@ -151,7 +151,7 @@ export default function Navbar({ onOpenAdmin }) {
               <button
                 key={link.id}
                 onClick={() => { scrollTo(link.id); setMenuOpen(false); }}
-                className={`w-full rounded-sm px-4 py-3 text-left font-mono text-sm uppercase tracking-widest outline-none transition-colors ${
+                className={`w-full border-b border-ink-line/50 px-4 py-3 text-left font-mono text-sm uppercase tracking-widest outline-none transition-colors ${
                   active === link.id
                     ? 'bg-blue-line/20 text-blue-bright'
                     : 'text-paper-dim hover:bg-ink-panel/40 hover:text-paper'
