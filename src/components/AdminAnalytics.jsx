@@ -242,23 +242,84 @@ function BarList({ title, data }) {
   );
 }
 
+function VisitorList({ visitors }) {
+  if (visitors.length === 0) {
+    return (
+      <div className="rounded-sm border border-ink-line bg-ink-panel/40 p-5">
+        <h4 className="font-mono text-xs uppercase tracking-wider text-paper-dim mb-4">Visitors</h4>
+        <p className="text-sm text-paper-dim">No visitors yet.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-sm border border-ink-line bg-ink-panel/40 p-5 md:col-span-2">
+      <h4 className="font-mono text-xs uppercase tracking-wider text-paper-dim mb-4">
+        Visitors <span className="text-paper-dim/50">({visitors.length} unique)</span>
+      </h4>
+      <div className="max-h-80 overflow-y-auto">
+        <table className="w-full text-left text-sm">
+          <thead>
+            <tr className="border-b border-ink-line/50 font-mono text-[11px] uppercase tracking-wider text-paper-dim">
+              <th className="pb-2 pr-4">IP</th>
+              <th className="pb-2 pr-4">Location</th>
+              <th className="pb-2 pr-4">Device</th>
+              <th className="pb-2">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {visitors.map((v) => (
+              <tr key={v.ipAddress} className="border-b border-ink-line/30 text-paper-dim">
+                <td className="py-2 pr-4 font-mono text-xs text-blue-bright">{v.ipAddress || '—'}</td>
+                <td className="py-2 pr-4">{[v.city, v.country].filter(Boolean).join(', ') || '—'}</td>
+                <td className="py-2 pr-4">{v.device}</td>
+                <td className="py-2 font-mono text-xs">{new Date(v.timestamp).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminAnalytics({ analytics }) {
   const stats = useMemo(() => {
     if (!analytics.length) return null;
+
     const uniqueIps = new Set(analytics.map((r) => r.ipAddress).filter(Boolean)).size;
-    const paths = topGroups(analytics, (r) => r.path, 8);
-    const countries = topGroups(analytics, (r) => [r.city, r.country].filter(Boolean).join(', ') || r.country, 6);
-    const referrers = topGroups(analytics, (r) => referrerLabel(r.referrer), 6);
-    const devices = topGroups(analytics, (r) => parseDevice(r.userAgent), 4);
+
+    const seenIps = new Set();
+    const deduped = [];
+    for (const row of analytics) {
+      const ip = row.ipAddress;
+      if (ip && seenIps.has(ip)) continue;
+      if (ip) seenIps.add(ip);
+      deduped.push(row);
+    }
+
+    const visitors = deduped
+      .map((r) => ({
+        ipAddress: r.ipAddress || '—',
+        country: r.country || '',
+        city: r.city || '',
+        device: parseDevice(r.userAgent),
+        timestamp: r.timestamp,
+      }))
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    const countries = topGroups(deduped, (r) => [r.city, r.country].filter(Boolean).join(', ') || r.country, 6);
+    const referrers = topGroups(deduped, (r) => referrerLabel(r.referrer), 6);
+    const devices = topGroups(deduped, (r) => parseDevice(r.userAgent), 4);
     const searchEngines = topGroups(
-      analytics.filter((r) => r.searchEngine),
+      deduped.filter((r) => r.searchEngine),
       (r) => r.searchEngine,
       6
     );
     const { labels, counts } = bucketizeByTime(analytics);
     return {
       uniqueIps,
-      paths,
+      visitors,
       countries,
       referrers,
       devices,
@@ -289,7 +350,7 @@ export default function AdminAnalytics({ analytics }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <BarList title="Top pages" data={stats.paths} />
+        <VisitorList visitors={stats.visitors} />
         <BarList title="Locations" data={stats.countries} />
         <BarList title="Referrers" data={stats.referrers} />
         <BarList title="Devices" data={stats.devices} />
