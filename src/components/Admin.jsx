@@ -126,7 +126,7 @@ export default function Admin({ onClose }) {
       setAnalytics(a.analytics || []);
       setSessions(s.sessions || []);
       fetchSetting('NOTIFY_NEW_VISITORS')
-        .then((r) => setNotifyVisitors(r.value === 'true'))
+        .then((r) => setNotifyVisitors(!!r.value))
         .catch(() => {});
     } catch (err) {
       if (err.isNetworkError) {
