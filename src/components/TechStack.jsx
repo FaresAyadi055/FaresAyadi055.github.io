@@ -4,17 +4,17 @@ const STACK = [
   {
     code: '01',
     category: 'Languages',
-    items: ['Python', 'Java', 'C'],
+    items: ['Python', 'Java', 'C','HTML / CSS / JavaScript','TypeScript'],
   },
   {
     code: '02',
     category: 'Frontend',
-    items: ['HTML / CSS / JavaScript', 'React', 'Vue.js', 'Svelte', 'TypeScript'],
+    items: [ 'React', 'Vue.js', 'Svelte'],
   },
   {
     code: '03',
     category: 'Backend & APIs',
-    items: ['Flask', 'Hono'],
+    items: ['Flask', 'Hono','Express'],
   },
   {
     code: '04',
