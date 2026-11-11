@@ -1,4 +1,12 @@
 [
+    {
+    "title": "Binance live simulation",
+    "description": "minimalist binance live simulation app that works entirely in the browser and connect directly to the binance api with no third part",
+    "productionUrl":null,
+    "demoUrl": "https://faresayadi055.github.io/Binance-_Trading_Simulator/",
+    "githubUrl": "https://github.com/FaresAyadi055/Binance-_Trading_Simulator",
+    "previewBroken": false
+  },
   {
     "title": "Pet ID.tn",
     "description": "Platform for pet identification using smart tags, built with Svelte, Hono, and SQLite on Cloudflare. Allows owners to register pets and link them to a digital profile accessible via QR code tags.",
